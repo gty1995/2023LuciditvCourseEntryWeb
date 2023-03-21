@@ -46,7 +46,7 @@ export default defineComponent({
             this.list = await queryAc();
         },
         apply(activity: Activity) {
-            console.log(activity.id)
+            // console.log(activity.id)
             this.$router.push({ path: `/apply/${activity.id}` })
 
         }

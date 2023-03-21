@@ -1,56 +1,108 @@
 //  Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, Timestamp } from 'firebase/firestore';
-import type { DocumentData } from 'firebase/firestore';
-import moment from 'moment';
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
+import type { DocumentData } from "firebase/firestore";
+import moment from "moment";
 
-import { Activity } from '@/models';
-import type { EntryForm } from '@/models';
+import { Activity, EntryRecord } from "@/models";
+import type { EntryForm } from "@/models";
 // import * as firebaseConfig from '';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://www.npmjs.com/package/firebase
 
-const firebaseConfig = require('./firebaseconfig.json')
+const firebaseConfig = require("./firebaseconfig.json");
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const activityCol = collection(db, 'Activity');
-const entryFormCol = collection(db, 'EntryForm');
+const activityCol = collection(db, "Activity");
+const entryFormCol = collection(db, "EntryForm");
 
-async function queryAc():Promise<Activity[]> {
-    const activitySnapshot = await getDocs(activityCol);
-    return activitySnapshot.docs.map(doc => { return docToActivity(doc)});
-} 
-
-async function queryAcById(acId:string):Promise<Activity> {
-    const docRef = doc(db, 'Activity', acId);
-    const activitySnapshot = await getDoc(docRef);
-    return docToActivity(activitySnapshot);
+async function queryAc(): Promise<Activity[]> {
+  const activitySnapshot = await getDocs(activityCol);
+  return activitySnapshot.docs.map((doc) => {
+    return docToActivity(doc);
+  });
 }
 
-async function addEntryForm(entryForm:EntryForm) {
-    console.log("entryForm",entryForm)
-    const entryFormSnapshot = await addDoc(entryFormCol, entryFormToDoc(entryForm))
-    console.log("entryFormSnapshot:",entryFormSnapshot)
+async function queryAcById(acId: string): Promise<Activity> {
+  const docRef = doc(db, "Activity", acId);
+  const activitySnapshot = await getDoc(docRef);
+  return docToActivity(activitySnapshot);
 }
 
-async function queryEntryForm():Promise<DocumentData[]> {
-    const snapshot = await getDocs(entryFormCol);
-    return snapshot.docs.map(doc => { return doc.data()});
-} 
-
-function entryFormToDoc(entryForm: EntryForm):DocumentData {
-    return {activityId:entryForm.activityId, name: entryForm.name, email: entryForm.email, cellphone: entryForm.cellphone, status: entryForm.status,createDT: Timestamp.now()}
+async function addEntryForm(entryForm: EntryForm) {
+  console.log("entryForm", entryForm);
+  const entryFormSnapshot = await addDoc(
+    entryFormCol,
+    entryFormToDoc(entryForm)
+  );
+  console.log("entryFormSnapshot:", entryFormSnapshot);
+  return entryFormSnapshot.id;
 }
 
-function docToActivity(doc: DocumentData):Activity {
-    let data = doc.data()
-    return new Activity(doc.id,data.title,data.subTitle,data.description,moment.unix(data.startDateTime.seconds).format('yyyy-MM-DD HH:mm'))
+async function queryEntryForm(): Promise<DocumentData[]> {
+  const snapshot = await getDocs(entryFormCol);
+  return snapshot.docs.map((doc) => {
+    return doc.data();
+  });
+}
+
+// 取得報名結果資料
+async function queryEntryFormById(
+  entryFormSnapshotId: string
+): Promise<EntryRecord> {
+  const docRef = doc(db, "EntryForm", entryFormSnapshotId);
+  const record = await getDoc(docRef);
+  return docToRecord(record);
+}
+
+function entryFormToDoc(entryForm: EntryForm): DocumentData {
+  return {
+    activityId: entryForm.activityId,
+    name: entryForm.name,
+    email: entryForm.email,
+    cellphone: entryForm.cellphone,
+    status: entryForm.status,
+    createDT: Timestamp.now(),
+  };
+}
+
+function docToActivity(doc: DocumentData): Activity {
+  let data = doc.data();
+  return new Activity(
+    doc.id,
+    data.title,
+    data.subTitle,
+    data.description,
+    moment.unix(data.startDateTime.seconds).format("yyyy-MM-DD HH:mm")
+  );
+}
+
+function docToRecord(doc: DocumentData): EntryRecord {
+  let data = doc.data();
+  return new EntryRecord(
+    doc.id,
+    data.name,
+    data.email,
+    data.cellphone,
+    data.activityId,
+    moment.unix(data.createDT.seconds).format("yyyy-MM-DD HH:mm")
+  );
 }
 
 export {
   queryAc,
   queryAcById,
   addEntryForm,
-  queryEntryForm
-}
+  queryEntryForm,
+  queryEntryFormById,
+};

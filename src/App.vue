@@ -3,8 +3,10 @@
     <div class="wrapper">
       <!-- <HelloWorld msg="福青學堂 課程報名" /> -->
       <nav>
-        <el-image class="logo" alt="logo" :src="url" fit="fit" />
-        <!-- <span style="font-weight:600; font-size:22px; letter-spacing:2px;">福青學堂</span> -->
+        <div class="company-logo">
+          <el-image class="logo" alt="logo" :src="url" fit="cover" />
+          <span style="font-weight:600; font-size:22px; letter-spacing:2px; color: #893946;">福青學堂</span>
+        </div>
         <div class="menu">
           <RouterLink to="/">首頁</RouterLink>
           <RouterLink to="/select">選擇活動</RouterLink>
@@ -13,8 +15,8 @@
     </div>
   </header>
 
-  <router-view v-slot="{ Component }">
-    <transition name="bgAnimation">
+  <router-view style="background: linear-gradient(15deg, #C15164 0%, #C15164 40%, #fad0c4 100%);" v-slot="{ Component }">
+    <transition name="bgAnimation" mode="out-in">
       <component :is="Component"></component>
     </transition>
   </router-view>
@@ -39,7 +41,6 @@ body {
   height: 100%;
   overflow: auto;
   margin: 0%;
-  background-image: linear-gradient(15deg, #C15164 0%, #C15164 40%, #fad0c4 100%);
 }
 
 #app {
@@ -52,7 +53,7 @@ body {
 
 nav {
   padding: 10px 80px 10px 50px;
-  box-shadow: 3px 3px 5px 6px #6a293466;
+  box-shadow: 1px 1px 20px 3px #6a293466;
   position: sticky;
   z-index: 999;
   display: flex;
@@ -72,18 +73,29 @@ nav a.router-link-exact-active {
   color: #a44151;
 }
 
+.company-logo {
+  display: flex;
+  align-items: center;
+}
+
 .logo {
   height: 40px;
   width: 40px;
+  margin-right: 10px;
 }
 
 .bgAnimation-enter-active,
 .bgAnimation-leave-active {
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .bgAnimation-enter-from,
 .bgAnimation-leave-to {
   opacity: 0;
+}
+
+.bgAnimation-enter-to,
+.bgAnimation-leave-from {
+  opacity: 1;
 }
 </style>
